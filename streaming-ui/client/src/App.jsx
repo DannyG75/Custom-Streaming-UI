@@ -1,15 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import TileGrid from './components/TileGrid.jsx';
-import SiteFrame from './components/SiteFrame.jsx';
 
-// Top-level kiosk shell. Two states:
-//   1. browsing -> show grouped tile grid
-//   2. viewing  -> show the picked site fullscreen with a Home button
+// Top-level kiosk shell. Shows the tile grid; clicking a tile navigates the
+// whole window to the site (iframe embedding doesn't work for most major
+// streaming sites because they send X-Frame-Options: DENY).
+//
+// To get back to the kiosk: Alt+Left (browser back), or Alt+Home if Chromium
+// has the kiosk URL set as its homepage (see scripts/openbox-autostart.sh /
+// the Desktop autostart .desktop file).
 export default function App() {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeSite, setActiveSite] = useState(null);
 
   const loadSites = useCallback(async () => {
     setLoading(true);
@@ -36,17 +38,9 @@ export default function App() {
     return () => clearInterval(id);
   }, [loadSites]);
 
-  // Esc returns to the home grid from a fullscreen site.
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === 'Escape') setActiveSite(null);
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  if (activeSite) {
-    return <SiteFrame site={activeSite} onHome={() => setActiveSite(null)} />;
+  function openSite(site) {
+    // Full-window navigation. The browser handles back/forward natively.
+    window.location.href = site.url;
   }
 
   return (
@@ -70,8 +64,12 @@ export default function App() {
         </p>
       )}
       {!loading && !error && sites.length > 0 && (
-        <TileGrid sites={sites} onPick={setActiveSite} />
+        <TileGrid sites={sites} onPick={openSite} />
       )}
+
+      <footer className="kiosk-footer">
+        Press <kbd>Alt</kbd> + <kbd>←</kbd> to come back home from any site.
+      </footer>
     </div>
   );
 }

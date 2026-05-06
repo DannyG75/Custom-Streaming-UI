@@ -37,6 +37,24 @@ button {
   flex-direction: column;
 }
 
+.kiosk-footer {
+  margin-top: auto;
+  padding: 16px 48px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  border-top: 1px solid #222;
+}
+
+.kiosk-footer kbd {
+  background: var(--bg-elev);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
 .kiosk-header {
   display: flex;
   align-items: center;
