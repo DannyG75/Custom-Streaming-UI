@@ -1,0 +1,195 @@
+/* Netflix-ish dark kiosk theme. Tuned for a TV / 1080p screen viewed
+   from across a room — large tiles, big labels, generous padding. */
+
+:root {
+  --bg: #0b0b0f;
+  --bg-elev: #16161d;
+  --fg: #f5f5f7;
+  --muted: #9aa0a6;
+  --accent: #e50914;
+  --tile-w: 240px;
+  --tile-h: 340px;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+.kiosk {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  border-bottom: 1px solid #222;
+}
+
+.kiosk-header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+.reload-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid #333;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.reload-btn:hover,
+.reload-btn:focus {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+
+.status {
+  padding: 32px 48px;
+  color: var(--muted);
+}
+
+.status.error {
+  color: #ff6b6b;
+}
+
+/* ---- Tile grid ---- */
+
+.tile-grid {
+  padding: 16px 0 48px;
+}
+
+.row {
+  margin: 24px 0;
+}
+
+.row-title {
+  margin: 0 48px 12px;
+  font-size: 20px;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.row-tiles {
+  display: flex;
+  gap: 16px;
+  padding: 8px 48px 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.row-tiles::-webkit-scrollbar {
+  height: 8px;
+}
+
+.row-tiles::-webkit-scrollbar-thumb {
+  background: #2a2a35;
+  border-radius: 4px;
+}
+
+.tile {
+  flex: 0 0 var(--tile-w);
+  height: var(--tile-h);
+  background: var(--bg-elev);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.tile:hover,
+.tile:focus {
+  transform: scale(1.05);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.tile-poster {
+  flex: 1;
+  width: 100%;
+  object-fit: cover;
+}
+
+.tile-fallback {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 96px;
+  font-weight: 700;
+  color: var(--fg);
+  background: linear-gradient(135deg, #2a2a35, #4a1f24);
+}
+
+.tile-label {
+  padding: 12px 16px;
+  background: var(--bg-elev);
+  font-size: 16px;
+  text-align: center;
+  color: var(--fg);
+}
+
+/* ---- Fullscreen site frame ---- */
+
+.site-frame {
+  position: fixed;
+  inset: 0;
+  background: black;
+}
+
+.site-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.home-btn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.65);
+  color: var(--fg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.home-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+  border-color: var(--accent);
+}

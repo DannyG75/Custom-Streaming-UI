@@ -1,0 +1,23 @@
+[Unit]
+Description=Chromium kiosk for the streaming UI
+After=streaming-ui.service network-online.target
+Requires=streaming-ui.service
+
+[Service]
+Type=simple
+User=__KIOSK_USER__
+PAMName=login
+TTYPath=/dev/tty7
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+# Start an X session running Openbox; once Openbox is up, launch Chromium
+# in --kiosk mode pointing at the local server. unclutter hides the cursor
+# after a second of idle so the screen looks like a real kiosk.
+ExecStart=/usr/bin/xinit /usr/bin/openbox-session -- :0 vt7 -nolisten tcp
+Environment=DISPLAY=:0
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=graphical.target

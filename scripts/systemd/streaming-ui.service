@@ -1,0 +1,17 @@
+[Unit]
+Description=Streaming UI — Express server for the kiosk
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__KIOSK_USER__
+WorkingDirectory=__REPO_DIR__/streaming-ui/server
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
