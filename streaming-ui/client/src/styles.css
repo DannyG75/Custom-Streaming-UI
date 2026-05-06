@@ -147,10 +147,13 @@ button {
 }
 
 .tile:hover,
-.tile:focus {
-  transform: scale(1.05);
+.tile:focus,
+.tile-focused {
+  transform: scale(1.08);
   border-color: var(--accent);
   outline: none;
+  box-shadow: 0 0 0 4px rgba(229, 9, 20, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 .tile-poster {

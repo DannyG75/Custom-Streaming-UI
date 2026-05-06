@@ -97,9 +97,22 @@ Wait a couple of minutes the first time so images download. Then:
 
 ```bash
 sudo tailscale up
+tailscale ip -4               # note this Tailscale IP — you'll use it on the phone
 ```
 
-Follow the URL it prints to authenticate. Install the Tailscale app on your phone and sign in with the same account so you can hit `http://<nuc-tailscale-ip>:2283` from anywhere.
+Follow the URL `tailscale up` prints to authenticate. Install the Tailscale app on your phone and sign in with the same account.
+
+#### Configuring the Immich app for both home WiFi and remote Tailscale
+
+The Immich mobile app supports a "preferred WiFi" feature that swaps the server URL automatically. Set it up so the app uses the LAN IP on your home WiFi (fast, direct) and the Tailscale IP everywhere else (works on cellular).
+
+1. In the Immich app: **Settings → Networking** (the wording is slightly different across versions — the option is sometimes called *Server endpoint* or *Advanced networking*).
+2. **Primary server URL:** `http://<nuc-lan-ip>:2283` — used when the phone is on your home WiFi (the SSID you mark as "preferred").
+3. **External server URL:** `http://<nuc-tailscale-ip>:2283` — used when off the preferred WiFi. Tailscale must be on (or always-on) for this to reach the NUC.
+4. **Preferred WiFi:** select your home network's SSID.
+5. Save. Toggle WiFi off and on to confirm the app reconnects on each network without manual sign-in.
+
+If the option doesn't appear, just sign in using the Tailscale URL only — Tailscale's network-aware routing will keep that IP reachable on both WiFi and cellular as long as Tailscale is on.
 
 ### 3f. Streaming UI + kiosk autostart
 
@@ -170,7 +183,81 @@ npx serve dist        # or any static host
 
 ---
 
-## 7. Tearing down a service
+## 7. Controller navigation (optional)
+
+Goal: navigate the kiosk grid and embedded streaming sites with a game controller (any XInput-compatible pad — Xbox One, Xbox Series, generic clones). Two layers:
+
+1. **System-level controller-to-keyboard mapping** via `antimicrox` — works in any application, including external streaming sites.
+2. **Native Gamepad API support in the kiosk client** — gives the home grid a console-like UX with visible focus and snappy navigation. (See `streaming-ui/client/src/useGamepad.js`.)
+
+### 7a. Pair the controller
+
+For an Xbox One controller, USB is plug-and-play (the `xpad` kernel module is built into Ubuntu). Bluetooth requires the `xpadneo` driver:
+
+```bash
+# USB: just plug it in, then verify
+ls /dev/input/js0          # should exist
+sudo apt install -y joystick
+jstest /dev/input/js0      # press buttons, watch values change. Ctrl+C to exit.
+
+# Bluetooth (optional — skip if using USB)
+sudo apt install -y dkms linux-headers-$(uname -r)
+sudo apt install -y xpadneo-dkms
+# Then in GNOME: Settings → Bluetooth → put controller in pairing mode
+# (hold Xbox button + sync button) → pair
+```
+
+### 7b. Install antimicrox and bind the buttons
+
+```bash
+sudo apt install -y antimicrox
+```
+
+Open **antimicrox** from the app launcher with the controller plugged in. The window shows a controller diagram on the left and your physical controller on the right. For each button you want to bind:
+
+1. Click the button on the diagram (e.g., "A").
+2. In the dialog that opens, click **Slot 1**, then press the key/key-combo on your keyboard you want that button to send (e.g., `Enter`).
+3. Click **Apply** → **Close**.
+
+Use the table below as your binding cheat sheet. Once everything's bound, **File → Save Profile As → `~/.config/antimicrox/streaming-kiosk.amgp`** so you can reload it later.
+
+Recommended button layout:
+
+| Controller | Maps to | Used for |
+|------------|---------|----------|
+| Left stick | Mouse movement | Pointing |
+| D-pad ↑/↓/←/→ | Arrow keys | List/menu navigation |
+| LB / RB | `Shift+Tab` / `Tab` | Cycle focus on the kiosk grid |
+| A | `Enter` | Activate (clicks the focused tile) |
+| B | `Alt+Left` | Browser back (return to kiosk from a site) |
+| Y | `F5` | Reload page |
+| X | `Backspace` | Text delete (search boxes) |
+| Start | `Alt+Home` | Jump to kiosk home |
+| Right trigger | Left mouse click | Click whatever the cursor is over |
+
+### 7c. Autostart antimicrox
+
+So the controller works from the moment the NUC boots:
+
+```bash
+mkdir -p ~/.config/autostart
+cat > ~/.config/autostart/antimicrox.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=AntiMicroX
+Exec=antimicrox --hidden --profile /home/REPLACE_ME/.config/antimicrox/streaming-kiosk.amgp
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Terminal=false
+EOF
+sed -i "s|REPLACE_ME|$USER|" ~/.config/autostart/antimicrox.desktop
+```
+
+Reboot. The controller should drive the kiosk and any site Chromium loads.
+
+---
+
+## 8. Tearing down a service
 
 | Action | Command |
 |---|---|
