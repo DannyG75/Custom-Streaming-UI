@@ -9,6 +9,14 @@ User=__KIOSK_USER__
 WorkingDirectory=__REPO_DIR__/streaming-ui/server
 Environment=NODE_ENV=production
 Environment=PORT=3000
+# DISPLAY and XAUTHORITY are needed so the /api/system/sleep endpoint can
+# call `xset dpms force off` against the user's running X session.
+# XAUTHORITY path may differ on your system — common locations:
+#   /home/__KIOSK_USER__/.Xauthority         (user-launched X)
+#   /run/user/1000/gdm/Xauthority            (GDM auto-login on Ubuntu Desktop)
+# install-power-control.sh detects the right one at install time.
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=__XAUTHORITY_PATH__
 ExecStart=/usr/bin/node index.js
 Restart=on-failure
 RestartSec=5

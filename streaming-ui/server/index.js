@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
 import sitesRouter from './routes/sites.js';
+import systemRouter from './routes/system.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
@@ -27,6 +28,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/sites', sitesRouter);
+app.use('/api/system', systemRouter);
 
 // Serve the built React app if it exists. During development you'll usually
 // run Vite separately on :5173, so this block is a no-op until you build.

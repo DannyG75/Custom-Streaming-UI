@@ -1,0 +1,12 @@
+# Allow the streaming-ui user to reboot/poweroff without a password.
+# The -n flag in the API enforces no password prompt — if this entry is
+# missing, sudo will fail and restart/shutdown won't work.
+#
+# Install with:
+#   sudo install -m 0440 scripts/sudoers-streaming-ui /etc/sudoers.d/streaming-ui
+#   sudo visudo -c   # validates all sudoers files; should print "parsed OK"
+#
+# REPLACE __KIOSK_USER__ with the actual user before installing — the
+# install-power-control.sh script does this automatically.
+
+__KIOSK_USER__ ALL=(root) NOPASSWD: /usr/sbin/reboot, /usr/sbin/poweroff

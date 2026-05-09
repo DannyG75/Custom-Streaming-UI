@@ -88,6 +88,162 @@ button {
   border-color: var(--fg);
 }
 
+/* ---- Header actions cluster ---- */
+
+.kiosk-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ---- Power menu ---- */
+
+.power-menu-wrap {
+  position: relative;
+}
+
+.power-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid #333;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.power-btn:hover,
+.power-btn:focus {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.power-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg-elev);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.power-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.power-menu-item:hover,
+.power-menu-item:focus {
+  background: #222;
+  border-color: #333;
+  outline: none;
+}
+
+.power-menu-item.danger {
+  color: #ff8c8c;
+}
+
+.power-menu-item.danger:hover,
+.power-menu-item.danger:focus {
+  background: rgba(255, 60, 60, 0.12);
+  border-color: rgba(255, 60, 60, 0.4);
+}
+
+.power-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+}
+
+.power-confirm {
+  padding: 12px;
+  text-align: center;
+}
+
+.power-confirm p {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.power-confirm-sub {
+  color: var(--muted);
+  font-size: 13px !important;
+  margin-bottom: 12px !important;
+}
+
+.power-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.power-confirm-btn {
+  padding: 8px 14px;
+  background: #222;
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.power-confirm-btn:hover {
+  border-color: var(--fg);
+}
+
+.power-confirm-yes {
+  background: rgba(229, 9, 20, 0.18);
+  color: #ff8c8c;
+  border-color: rgba(229, 9, 20, 0.45);
+}
+
+.power-confirm-yes:hover {
+  background: rgba(229, 9, 20, 0.32);
+}
+
+.power-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  background: var(--bg-elev);
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.power-toast-error {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.power-toast-ok {
+  border-color: var(--accent);
+}
+
 .status {
   padding: 32px 48px;
   color: var(--muted);

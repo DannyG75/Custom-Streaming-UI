@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import TileGrid from './components/TileGrid.jsx';
+import PowerMenu from './components/PowerMenu.jsx';
 import { useGamepad } from './useGamepad.js';
 
 // Top-level kiosk shell. Shows the tile grid; clicking a tile (or pressing A
@@ -76,9 +77,12 @@ export default function App() {
     <div className="kiosk">
       <header className="kiosk-header">
         <h1>Home Streaming</h1>
-        <button className="reload-btn" onClick={loadSites} aria-label="Reload">
-          ⟳
-        </button>
+        <div className="kiosk-header-actions">
+          <button className="reload-btn" onClick={loadSites} aria-label="Reload">
+            ⟳
+          </button>
+          <PowerMenu />
+        </div>
       </header>
 
       {loading && <p className="status">Loading…</p>}

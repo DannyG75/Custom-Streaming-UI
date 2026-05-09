@@ -183,6 +183,37 @@ npx serve dist        # or any static host
 
 ---
 
+## 6.5 Power controls (optional but recommended)
+
+Adds Sleep / Restart / Shutdown buttons to the kiosk header so the family can put the screen to sleep or shut down the NUC without finding a keyboard.
+
+```bash
+sudo bash scripts/install-power-control.sh
+```
+
+What this does:
+
+- Installs `/etc/sudoers.d/streaming-ui` so the kiosk user can run `reboot` and `poweroff` without a password (validated with `visudo` before install)
+- Updates the `streaming-ui.service` systemd unit with the right `DISPLAY` and `XAUTHORITY` env vars so the **Sleep display** action can call `xset` against your Xorg session
+- Restarts the streaming-ui service so changes take effect
+
+After install, refresh the kiosk in the browser. Top-right corner now has a ⏻ icon next to the reload button. Click → menu opens → pick:
+
+- **Sleep display** — turns the monitor off via DPMS. Immich/Jellyfin keep running so phones can still back up. Move the mouse / press a key / press the controller's Xbox button to wake.
+- **Restart** — confirms, then `sudo reboot`. NUC comes back in ~30s, kiosk autostarts.
+- **Shut down** — confirms, then `sudo poweroff`. Press the NUC's physical power button to turn it back on.
+
+**Note about the `XAUTHORITY` path**: the install script auto-detects whether you're on a GDM auto-login session (`/run/user/1000/gdm/Xauthority`) or a user-launched X session (`/home/<user>/.Xauthority`) and writes the right one into the systemd unit. If sleep doesn't work after install, check:
+
+```bash
+systemctl show streaming-ui --property=Environment
+sudo -u $USER xset -display :0 dpms force off    # manual test
+```
+
+If the manual `xset` works but the API doesn't, fix the `XAUTHORITY` path in `/etc/systemd/system/streaming-ui.service` and `sudo systemctl daemon-reload && sudo systemctl restart streaming-ui`.
+
+---
+
 ## 7. Controller navigation (optional)
 
 Goal: navigate the kiosk grid and embedded streaming sites with a game controller (any XInput-compatible pad — Xbox One, Xbox Series, generic clones). Two layers:
