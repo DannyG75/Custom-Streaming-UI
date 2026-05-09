@@ -32,21 +32,22 @@ export function useGamepad({ onNavigate, onSelect, onBack, onReload }) {
     const directionState = { dir: null, repeatAt: 0 };
 
     function readDirection(gp) {
-      // Combine D-pad and left stick into a single dominant direction.
-      let x = gp.axes[0] || 0;
-      let y = gp.axes[1] || 0;
-      if (Math.abs(x) < STICK_DEADZONE) x = 0;
-      if (Math.abs(y) < STICK_DEADZONE) y = 0;
+      // D-pad ONLY for tile navigation. Analog sticks are reserved for
+      // mouse control (handled by antimicrox at the system level), so we
+      // intentionally ignore axes[0..3] here — otherwise moving the cursor
+      // would also scroll the tile focus.
+      let x = 0;
+      let y = 0;
       if (gp.buttons[14]?.pressed) x = -1;
       if (gp.buttons[15]?.pressed) x = 1;
       if (gp.buttons[12]?.pressed) y = -1;
       if (gp.buttons[13]?.pressed) y = 1;
       if (Math.abs(x) > Math.abs(y)) {
-        if (x > 0.5) return 'right';
-        if (x < -0.5) return 'left';
+        if (x > 0) return 'right';
+        if (x < 0) return 'left';
       } else {
-        if (y > 0.5) return 'down';
-        if (y < -0.5) return 'up';
+        if (y > 0) return 'down';
+        if (y < 0) return 'up';
       }
       return null;
     }
