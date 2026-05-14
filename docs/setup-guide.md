@@ -183,6 +183,56 @@ npx serve dist        # or any static host
 
 ---
 
+## 6.4 Replace snap Chromium with deb Chromium (recommended for performance)
+
+Ubuntu 24.04 ships Chromium only as a snap. The snap has two big drawbacks for kiosk use:
+
+1. **Cold-start time of 30-90 seconds** due to apparmor + snap-confine + mount-namespace setup on every launch. The kiosk's autostart script ends up polling for the window for almost a full minute before mutter can fullscreen it.
+2. **Hardware video acceleration is disabled** inside the snap sandbox. The Haswell GPU on the NUC has a perfectly capable QuickSync decoder for h.264 at 1080p, but the snap can't reach it — video decode falls back to software, which on this CPU is ~80% CPU usage during playback.
+
+The fix is a real `.deb` Chromium from the `saiarcot895/chromium-beta` PPA (well-maintained, used by many Ubuntu kiosk builds).
+
+```bash
+sudo bash scripts/install-deb-chromium.sh
+```
+
+What this script does:
+
+- Removes the snap and the `chromium-browser` snap-transition apt package
+- Adds the PPA and pins it at priority 1001 so future apt updates can't replace it
+- Installs `chromium-browser` (real deb), `chromium-codecs-ffmpeg-extra`, Intel VAAPI drivers (`i965-va-driver` for Haswell, `intel-media-va-driver` for newer Intel), and `vainfo` for diagnostics
+- Runs `vainfo` at the end to confirm a hardware driver loaded
+
+After it finishes, install the updated kiosk launcher (it calls `chromium-browser` instead of `chromium` and adds the VAAPI flags):
+
+```bash
+cp scripts/start-kiosk.sh ~/.local/bin/start-streaming-kiosk.sh
+chmod +x ~/.local/bin/start-streaming-kiosk.sh
+```
+
+Reboot to test. The kiosk should now come up in ~5-10 seconds instead of ~60. Cross-check hardware video acceleration is actually working:
+
+```bash
+chromium-browser chrome://gpu &
+# Look at the "Video Decode" line — should say "Hardware accelerated"
+```
+
+Then play any Netflix/YouTube video and check CPU usage with `top` — should sit under 15% on the i5-4250U during 1080p playback, vs ~80% before.
+
+**Rollback if anything goes wrong**:
+
+```bash
+sudo apt remove --purge chromium-browser
+sudo rm /etc/apt/preferences.d/saiarcot895-chromium
+sudo add-apt-repository --remove ppa:saiarcot895/chromium-beta
+sudo snap install chromium
+# Restore the snap-era kiosk launcher from git if needed:
+git checkout main -- scripts/start-kiosk.sh
+cp scripts/start-kiosk.sh ~/.local/bin/start-streaming-kiosk.sh
+```
+
+---
+
 ## 6.5 Power controls (optional but recommended)
 
 Adds Sleep / Restart / Shutdown buttons to the kiosk header so the family can put the screen to sleep or shut down the NUC without finding a keyboard.
